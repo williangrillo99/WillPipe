@@ -1,0 +1,14 @@
+[
+  {
+    "IdPipeline": "1",
+    "Name": "Faculade"
+  },
+  {
+    "IdPipeline": "2",
+    "Name": "Emprego"
+  },
+  {
+    "IdPipeline": "3",
+    "Name": "Vida"
+  }
+]
