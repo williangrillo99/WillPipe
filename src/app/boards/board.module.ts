@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AvatarModule } from 'primeng/avatar';
-import { AvatarGroupModule } from 'primeng/avatargroup';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TieredMenuModule } from 'primeng/tieredmenu';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -19,14 +18,15 @@ import { ListBoardComponent } from './pages/list-board/list-board.component';
 import { BoardRoutingModule } from './board-routing.module';
 import { KanbanService } from '../pipeline/services/kanban.service';
 import { KanbanModule } from '../pipeline/kanban.module';
+import { AvatarGroupModule } from 'primeng/avatargroup';
 
 @NgModule({
   declarations: [ListBoardComponent],
   imports: [
+    AvatarGroupModule,
     BoardRoutingModule,
     CommonModule,
     AvatarModule,
-    AvatarGroupModule,
     ProgressBarModule,
     TieredMenuModule,
     DragDropModule,

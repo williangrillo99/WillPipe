@@ -17,22 +17,22 @@ export class AppMenuComponent implements OnInit {
           {
             label: 'Boards',
             icon: 'pi pi-fw pi-home',
-            routerLink: ['/boards'],
+            routerLink: ['/app/boards'],
           },
           {
             label: 'Pipelines',
             icon: 'pi pi-fw pi-home',
-            routerLink: ['/pipelines'],
+            routerLink: ['/app/pipelines'],
           },
           {
             label: 'Cartoes',
             icon: 'pi pi-fw pi-home',
-            routerLink: ['/cartoes'],
+            routerLink: ['/app/cartoes'],
           },
           {
             label: 'Tarefas',
             icon: 'pi pi-fw pi-home',
-            routerLink: ['/tarefas'],
+            routerLink: ['/app/tarefas'],
           },
         ],
       },
