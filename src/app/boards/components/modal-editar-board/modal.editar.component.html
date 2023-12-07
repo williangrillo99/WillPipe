@@ -1,0 +1,35 @@
+<p-sidebar  [(visible)]="editarsidebarVisible" position="right" [baseZIndex]="10000" styleClass="w-8 md:w-6 lg:w-5 xl:w-4"
+  [showCloseIcon]="false">
+  <ng-template pTemplate="content">
+    <form [formGroup]="formBoardEditar">
+      <div class="px-4 py-6 border-bottom-1 surface-border flex align-items-center justify-content-between h-4rem">
+        <div>
+            <span class="block text-900 font-semibold text-lg pl-2">{{board.nome}}</span>
+        </div>
+        <div class="flex">
+          <button pButton pRipple type="button" icon="pi pi-times"
+            class="p-button-rounded p-button-text p-button-secondary" (click)="close()"></button>
+        </div>
+      </div>
+      <div class="grid grid-nogutter gap-5 pt-5 flex-wrap flex-1 flex flex-column">
+        <div class="col-12 field px-5">
+          <label for="start" class="block text-900 font-semibold">Nome</label>
+          <input id="password" type="text" pInputText formControlName="Nome" class="w-full">
+
+        </div>
+        <div class="col-12 field px-5">
+          <label for="start" class="block text-900 font-semibold">Descrição</label>
+          <textarea id="description" placeholder="Digite a descrição do card" formControlName="Descricao" type="text"
+            pInputTextarea [rows]="5" style="resize: none" class="w-full"></textarea>
+        </div>
+      </div>
+    </form>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <div class="flex w-full justify-content-end border-top-1 surface-border py-5 px-5 gap-3">
+      <button pButton pRipple type="button" label="Deletar" class="p-button-outlined p-button-danger" (click)="deletar()"></button>
+      <button pButton pRipple type="button"(click)="close()" label="Cancelar" class="p-button-primary p-button-danger"></button>
+      <button pButton pRipple type="submit" label="Salvar" class="p-button-primary h-3rem" (click)="enviar()"></button>
+    </div>
+  </ng-template>
+</p-sidebar>

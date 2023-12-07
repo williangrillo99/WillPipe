@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
 })
 export class AppMenuComponent implements OnInit {
   model: any[] = [];
-
+  any: any;
   ngOnInit() {
     this.model = [
       {
@@ -22,17 +22,14 @@ export class AppMenuComponent implements OnInit {
           {
             label: 'Pipelines',
             icon: 'pi pi-fw pi-home',
-            routerLink: ['/app/pipelines'],
+            routerLink: ['/app/pipeline/'],
+            expanded: true,
+            routerLinkActiveOptions: 'active',
           },
           {
             label: 'Cartoes',
             icon: 'pi pi-fw pi-home',
             routerLink: ['/app/cartoes'],
-          },
-          {
-            label: 'Tarefas',
-            icon: 'pi pi-fw pi-home',
-            routerLink: ['/app/tarefas'],
           },
         ],
       },

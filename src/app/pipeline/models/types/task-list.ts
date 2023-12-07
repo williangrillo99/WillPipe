@@ -1,11 +1,10 @@
-import { Tarefa, Task } from './task';
+import { Task } from './task';
 
 export interface TaskList {
   id?: string;
   title: string;
   tasks: Task[];
 }
-export interface ListaTarefa {
+export interface ITarefa {
   Id: number;
-  Tarefas: Tarefa[];
 }

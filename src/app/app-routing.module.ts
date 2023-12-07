@@ -16,7 +16,7 @@ const routes: Routes = [
           import('src/app/boards/board.module').then((m) => m.BaordModule),
       },
       {
-        path: 'pipelines',
+        path: 'pipeline',
         canActivate: [authGuard],
         data: { breadcrumb: 'Pipelines' },
         loadChildren: () =>

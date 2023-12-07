@@ -2,7 +2,7 @@ export interface Assignee {
   name: string;
   image: string;
 }
-export interface Usuario {
+export interface IUsuario {
   Id: number;
   Nome: string;
   Email: string;

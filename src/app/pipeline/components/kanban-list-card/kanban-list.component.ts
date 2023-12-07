@@ -4,12 +4,14 @@ import {
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { MenuItem } from 'primeng/api';
-import { KanbanCard } from '../../models/types/kanban-card';
+import { MenuItem, MessageService } from 'primeng/api';
+import { ICartao } from '../../models/types/kanban-card';
 import { KanbanList } from '../../models/types/kanban-list';
 import { KanbanService } from '../../services/kanban.service';
 import { KanbanComponent } from '../../pages/kanban/kanban.component';
-
+import { IColunaCartao, TituloRequest } from '../../models/types/colunaCartao';
+import { Observable, tap } from 'rxjs';
+import { MoverCartaoColunaRequest } from '../../models/types/atualizarCartao';
 @Component({
   selector: 'app-kanban-list',
   templateUrl: './kanban-list.component.html',
@@ -17,10 +19,19 @@ import { KanbanComponent } from '../../pages/kanban/kanban.component';
 })
 export class KanbanListComponent implements OnInit {
   @Input() list!: KanbanList;
-
   @Input() listIds!: string[];
-
+  @Input() coluna!: IColunaCartao;
+  @Input() colunaNomes!: Array<string>;
+  @Input() idBoard!: number;
+  spinner: Observable<boolean>;
+  listString: Array<string> = [];
+  loading: boolean = false;
   menuItems: MenuItem[] = [];
+  request!: MoverCartaoColunaRequest;
+  previousIndex!: any[];
+  currentIndex!: any[];
+  previus!: Array<ICartao>;
+  current!: Array<ICartao>;
 
   title: string = '';
 
@@ -34,23 +45,24 @@ export class KanbanListComponent implements OnInit {
 
   constructor(
     public parent: KanbanComponent,
-    private kanbanService: KanbanService
-  ) {}
+    private kanbanService: KanbanService,
+    private service: MessageService
+  ) {
+    this.spinner = this.kanbanService.spinner$;
+  }
 
   ngOnInit(): void {
     this.isMobileDevice = this.kanbanService.isMobileDevice();
-
     this.menuItems = [
       {
         label: 'Ações',
         items: [
           { separator: true },
-          { label: 'Copiar coluna', command: () => this.onCopy(this.list) },
           {
             label: 'Deletar coluna',
             command: () => {
-              if (this.list.listId) {
-                this.onDelete(this.list.listId);
+              if (this.coluna) {
+                this.onDelete(this.coluna);
               }
             },
           },
@@ -63,15 +75,20 @@ export class KanbanListComponent implements OnInit {
     this.parent.sidebarVisible = true;
   }
 
-  onDelete(id: string) {
-    this.kanbanService.deleteList(id);
+  onDelete(id: any) {
+    this.kanbanService.deleterColuna(id.idColuna).subscribe((x) => {
+      this.kanbanService.getColunas(this.idBoard).subscribe((x) => {
+        this.kanbanService.colunas.next(x.coluna);
+        this.service.add({
+          severity: 'success',
+          summary: 'Sucesso!',
+          detail: 'Coluna deletada',
+        });
+      });
+    });
   }
 
-  onCopy(list: KanbanList) {
-    this.kanbanService.copyList(list);
-  }
-
-  onCardClick(event: Event, card: KanbanCard) {
+  onCardClick(event: Event, card: ICartao) {
     const eventTarget = event.target as HTMLElement;
     if (
       !(
@@ -79,20 +96,31 @@ export class KanbanListComponent implements OnInit {
         eventTarget.classList.contains('p-trigger')
       )
     ) {
-      if (this.list.listId) {
-        this.kanbanService.onCardSelect(card, this.list.listId);
+      if (card) {
+        this.kanbanService.onCartaoSelect(card);
       }
-      this.parent.sidebarVisible = true;
+      this.kanbanService.openModal();
     }
   }
 
   insertCard() {
-    if (this.list.listId) {
-      this.kanbanService.addCard(this.list.listId);
+    if (this.coluna) {
+      this.kanbanService
+        .adicionarCartao(this.coluna.idColuna)
+        .subscribe((x) => {
+          this.kanbanService.getColunas(this.idBoard).subscribe((x) => {
+            this.kanbanService.colunas.next(x.coluna);
+            this.service.add({
+              severity: 'success',
+              summary: 'Sucesso!',
+              detail: 'Cartao criado',
+            });
+          });
+        });
     }
   }
 
-  dropCard(event: CdkDragDrop<KanbanCard[]>): void {
+  dropCard(event: CdkDragDrop<ICartao[]>): void {
     if (event.previousContainer === event.container) {
       moveItemInArray(
         event.container.data,
@@ -106,7 +134,41 @@ export class KanbanListComponent implements OnInit {
         event.previousIndex,
         event.currentIndex
       );
+      var request = new MoverCartaoColunaRequest({
+        colunaAtual: event.container.data,
+        colunaAntiga: event.previousContainer.data,
+        NomeConlunaAnterior: event.previousContainer.id,
+        NomeColunaIndex: event.container.id,
+        idBoard: this.idBoard,
+      });
+
+      this.kanbanService.moverCartaoCaluna(request).subscribe((x) => {
+        this.kanbanService.exibirBoards().subscribe((x) => {
+          this.kanbanService.getColunas(this.idBoard).subscribe((x) => {
+            this.kanbanService.colunas.next(x.coluna);
+            this.service.add({
+              severity: 'success',
+              summary: 'Sucesso!',
+              detail: 'Cartao atualizado',
+            });
+          });
+        });
+      });
     }
+  }
+
+  atualizaTitulo(id: number, nomeAtualizado: string) {
+    let titulo: TituloRequest = new TituloRequest(nomeAtualizado);
+    this.kanbanService.atualizarTituloColuna(id, titulo).subscribe((x) => {
+      this.kanbanService.getColunas(this.idBoard).subscribe((x) => {
+        this.kanbanService.colunas.next(x.coluna);
+        this.service.add({
+          severity: 'success',
+          summary: 'Sucesso!',
+          detail: 'Titulo atualizado',
+        });
+      });
+    });
   }
 
   focus() {

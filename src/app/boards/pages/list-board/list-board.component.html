@@ -1,43 +1,59 @@
-<div style="display: flex; gap: 20px;">
-  <ng-container *ngFor="let item of board">
-    <a href="#">
-      <div class="card">
-        <div class="icone">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none"  stroke-width="1.5" stroke="currentColor" aria-hidden="true" fit="" height="100%" width="100%" preserveAspectRatio="xMidYMid meet"  focusable="false">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/>
-        </svg>
-        </div>
-        <div class="titulo">
-          {{item.nome}}
-        </div>
-        <div class="descricao">
-          {{item.descricao}}
-        </div>
-        <div class="separador">
-        </div>
-        <div class="perfis">
-          <div class="card justify-content-center">
-            <p-avatarGroup styleClass="mb-3">
-                <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" size="large" shape="circle"></p-avatar>
-                <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/asiyajavayant.png" size="large" shape="circle"></p-avatar>
-                <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/onyamalimba.png" size="large" shape="circle"></p-avatar>
-                <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/ionibowcher.png" size="large" shape="circle"></p-avatar>
-                <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/xuxuefeng.png" size="large" shape="circle"></p-avatar>
-                <p-avatar label="+2" shape="circle" size="large" [style]="{ 'background-color': '#9c27b0', color: '#ffffff' }"></p-avatar>
-            </p-avatarGroup>
-        </div>
-        </div>
-        <div class="editado">
-          <div style="color: #64748b;">Edited:</div>
-          <div style="color: #1e293b; margin-left: 4px;">há 1 dia </div>
+
+
+  <ng-container *ngIf="board as board; else loading">
+    <p-toast></p-toast>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap">
+    <ng-container *ngFor="let item of board">
+      <div  (click)="selectBoard(item);">
+        <div class="card">
+          <div class="icone">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none"  stroke-width="1.5" stroke="currentColor" aria-hidden="true" fit="" height="100%" width="100%" preserveAspectRatio="xMidYMid meet"  focusable="false">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/>
+          </svg>
+          </div>
+          <div class="titulo">
+            {{item.nome}}
+          </div>
+          <div class="descricao">
+            {{item.descricao}}
+          </div>
+          <div class="separador">
+          </div>
+          <div class="perfis">
+              <p-avatarGroup styleClass="mb-1">
+                  <p-avatar label="Eu" shape="circle" size="large" [style]="{ 'background-color': '#9c27b0', color: '#ffffff' }"></p-avatar>
+              </p-avatarGroup>
+          </div>
+          <div class="editado">
+            <div style="color: #64748b;">Edited:</div>
+            <div style="color: #1e293b; margin-left: 4px;">há 1 dia </div>
+          </div>
 
         </div>
+        <div class="botao">
+          <a class="redirecionar" style="width: 100%; height: 100%; "
+          label="Visualizar"
+          routerLink="../pipeline/{{item.id}}">Visualizar</a>
+        </div>
       </div>
+
+    </ng-container>
+    <a>
+      <div class="card_adicionar"(click)="toggleSidebar()">
+        <h6>Adicionar novo board</h6>
+        <i  class="pi pi-plus" id="icon"></i>
+       </div>
     </a>
+  </div>
+
   </ng-container>
-  <a>
-    <div class="card_adicionar">
-      <i  class="pi pi-plus" id="icon"></i>
-     </div>
-  </a>
-</div>
+ <ng-template #loading>
+  <div class="flex justify-content-center" style="height: 60vh; align-items: center;">
+    <h1>Carregando <span style="color: #3B82F6;">seu  board.</span></h1>
+  </div>
+  </ng-template>
+
+
+<app-modal-board [sidebarVisible]="sidebarVisible"  (closeSideBar)="toggleSidebar()"></app-modal-board>
+
+<app-modal-editar-board [editarsidebarVisible]="selectEditar"  (closeSideBar)="editarFechart()"></app-modal-editar-board>

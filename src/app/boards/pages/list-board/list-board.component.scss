@@ -3,8 +3,10 @@
   width: 224px;
   background: #fff;
   padding: 24px;
-  box-shadow:  0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
-  border-radius: 8px;
+  box-shadow:  0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 0px 0px;
+  border-radius: 8px 8px 0px 0px;
+  border-bottom: 0px;
+  margin: auto;
 }
 .card:hover{
   box-shadow:
@@ -21,6 +23,22 @@
   background: #f6f9fc;
   color: #3B82F6;
   border-radius: 999px;
+}
+.botao{
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.redirecionar{
+  padding: 5px;
+  color: white;
+  text-align: center;
+  border-bottom: 1px solid #dfe7ef;
+  border-left: 1px solid #dfe7ef;
+  border-right: 1px solid #dfe7ef;
+  border-radius: 0px 0px 8px 8px;
+  background-color: #3B82F6;
 }
 .titulo{
   margin-top: 20px;
@@ -75,12 +93,12 @@
   height: 307px;
   width: 224px;
   border-color: rgb(209 213 219 /1);
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 .card_adicionar:hover{
-  background-color: #c5cbd3;
+  background-color: #d9e0e9;
   opacity: 12%;
   border: 1.5px;
   border-style: dashed;

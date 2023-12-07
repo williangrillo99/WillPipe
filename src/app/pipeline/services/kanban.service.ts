@@ -1,161 +1,103 @@
+import { ListaBoard } from './../models/types/listboard';
+import { BoardNome } from './../../cards/models/board-nome.response';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { KanbanCard } from '../models/types/kanban-card';
+import {
+  Cartao,
+  CartaoEditarRequest,
+  ICartao,
+  KanbanCard,
+} from '../models/types/kanban-card';
 import { KanbanList } from '../models/types/kanban-list';
 import { KanbanPipeline } from '../models/types/kanban-pipeline';
-import { Board } from '../models/types/board';
+import { Board, IBoard } from '../models/types/board';
+import {
+  BoardMain,
+  CreateBoardResquest,
+} from '../../boards/models/interface/create-board-resquest';
+import {
+  AdicionarColunaRequest,
+  Coluna,
+  IColuna,
+} from '../models/types/colunas';
+import {
+  IColunaCartao,
+  IColunasListagem,
+  TituloRequest,
+} from '../models/types/colunaCartao';
+import { MoverCartaoColunaRequest } from '../models/types/atualizarCartao';
+import { EditBoardRequest } from '../../boards/models/interface/edit-board-request';
 
 @Injectable()
 export class KanbanService {
   urlbase = 'https://localhost:7142/';
+
   private _lists: KanbanList[] = [];
 
+  private _colunas: IColunaCartao[] = [];
+
+  private _board: Board[] = [];
+
+  private spinner = new BehaviorSubject<boolean>(false);
+
+  public spinner$ = this.spinner.asObservable();
+
+  private _openModal = new BehaviorSubject<boolean>(false);
+
+  public openModal$ = this._openModal.asObservable();
+
   private selectedCard = new Subject<KanbanCard>();
+  private selectedCartao = new Subject<ICartao>();
 
   private selectedListId = new Subject<string>();
 
   private lists = new BehaviorSubject<KanbanList[]>(this._lists);
+  public board = new BehaviorSubject<Board[]>(this._board);
+
+  public colunas = new BehaviorSubject<Array<IColunaCartao>>(this._colunas);
 
   private listNames = new Subject<any[]>();
+  private selectBoard = new Subject<Board>();
+  public editar = new BehaviorSubject<boolean>(false);
 
+  editar$ = this.editar.asObservable();
+  board$ = this.board.asObservable();
+
+  selectId = new Subject<number>();
+
+  selectId$ = this.selectId.asObservable();
+
+  selectBoard$ = this.selectBoard.asObservable();
   lists$ = this.lists.asObservable();
+  colunas$ = this.colunas.asObservable();
 
   selectedCard$ = this.selectedCard.asObservable();
+  selectedCartao$ = this.selectedCartao.asObservable();
 
   selectedListId$ = this.selectedListId.asObservable();
 
   listNames$ = this.listNames.asObservable();
 
-  constructor(private http: HttpClient) {
-    this.http
-      .get<any>('assets/demo/data/kanban.json')
-      .toPromise()
-      .then((res) => res.data as KanbanPipeline[])
-      .then((data) => {
-        this.updateLists(data);
-      });
+  constructor(private http: HttpClient) {}
+
+  updateBoard(board: Array<Board>) {
+    this.board.next(board);
   }
 
-  private updateLists(data: any[]) {
-    this._lists = data;
-    let small = data.map((l) => ({ listId: l.listId, title: l.title }));
-
-    this.listNames.next(small);
-    this.lists.next(data);
+  hideSpinner() {
+    this.spinner.next(true);
   }
 
-  recoverPipelines(): Observable<Array<KanbanPipeline>> {
-    return this.http.get<any>('../../../assets/demo/data/pipeline.json');
+  showSpinner() {
+    this.spinner.next(false);
   }
 
-  addList() {
-    const listId = this.generateId();
-    const title = 'Coluna adicionada';
-    const newList = {
-      listId: listId,
-      title: title,
-      cards: [],
-    };
-
-    this._lists.push(newList);
-    this.lists.next(this._lists);
+  openModal() {
+    this._openModal.next(true);
   }
-
-  addCard(listId: string) {
-    const cardId = this.generateId();
-    const title = 'Cartao adicionado';
-    const newCard = {
-      id: cardId,
-      title: title,
-      description: '',
-      progress: '',
-      assignees: [],
-      attachments: 0,
-      comments: [],
-      startDate: '',
-      dueDate: '',
-      completed: false,
-      taskList: { title: 'Untitled Task List', tasks: [] },
-    };
-
-    let lists = [];
-    lists = this._lists.map((l) =>
-      l.listId === listId ? { ...l, cards: [...(l.cards || []), newCard] } : l
-    );
-    this.updateLists(lists);
-  }
-
-  updateCard(card: KanbanCard, listId: string) {
-    let lists = this._lists.map((l) =>
-      l.listId === listId
-        ? {
-            ...l,
-            cards: l.cards.map((c) => (c.id === card.id ? { ...card } : c)),
-          }
-        : l
-    );
-    this.updateLists(lists);
-  }
-
-  deleteList(id: string) {
-    this._lists = this._lists.filter((l) => l.listId !== id);
-    this.lists.next(this._lists);
-  }
-
-  copyList(list: KanbanList) {
-    let newId = this.generateId();
-    let newList = { ...list, listId: newId };
-
-    this._lists.push(newList);
-    this.lists.next(this._lists);
-  }
-
-  deleteCard(cardId: string, listId: string) {
-    let lists = [];
-
-    for (let i = 0; i < this._lists.length; i++) {
-      let list = this._lists[i];
-
-      if (list.listId === listId && list.cards) {
-        list.cards = list.cards.filter((c) => c.id !== cardId);
-      }
-
-      lists.push(list);
-    }
-
-    this.updateLists(lists);
-  }
-
-  copyCard(card: KanbanCard, listId: string) {
-    let lists = [];
-
-    for (let i = 0; i < this._lists.length; i++) {
-      let list = this._lists[i];
-
-      if (list.listId === listId && list.cards) {
-        let cardIndex = list.cards.indexOf(card);
-        let newId = this.generateId();
-        let newCard = { ...card, id: newId };
-        list.cards.splice(cardIndex, 0, newCard);
-      }
-
-      lists.push(list);
-    }
-
-    this.updateLists(lists);
-  }
-
-  moveCard(card: KanbanCard, targetListId: string, sourceListId: string) {
-    if (card.id) {
-      this.deleteCard(card.id, sourceListId);
-      let lists = this._lists.map((l) =>
-        l.listId === targetListId
-          ? { ...l, cards: [...(l.cards || []), card] }
-          : l
-      );
-      this.updateLists(lists);
-    }
+  showModal() {
+    this._openModal.next(false);
   }
 
   onCardSelect(card: KanbanCard, listId: string) {
@@ -163,26 +105,92 @@ export class KanbanService {
     this.selectedListId.next(listId);
   }
 
-  generateId() {
-    let text = '';
-    let possible =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    for (var i = 0; i < 5; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-
-    return text;
+  onCartaoSelect(card: ICartao) {
+    this.selectedCartao.next(card);
   }
 
-  recoverBaord(): Observable<Array<Board>> {
+  onSelectBoard(board: Board) {
+    this.selectBoard.next(board);
+  }
+
+  getBaords(): Observable<Array<Board>> {
     return this.http.get<Array<Board>>(this.urlbase + 'board/listar');
   }
 
+  getColunas(id: number) {
+    return this.http.get<IColunasListagem>(
+      this.urlbase + 'colunas/Listar/' + id
+    );
+  }
+
+  addBoard(board: CreateBoardResquest): Observable<any> {
+    return this.http.post<any>(this.urlbase + 'board/Adicionar', board);
+  }
+
+  addColuna(coluna: AdicionarColunaRequest): Observable<IColuna> {
+    return this.http.post<IColuna>(this.urlbase + 'colunas/Adicionar', coluna);
+  }
+  getCartoes(id: number): Observable<Array<ICartao>> {
+    return this.http.get<Array<ICartao>>(this.urlbase + 'cartoes/listar' + id);
+  }
+
+  atualizarTituloColuna(id: number, titulo: TituloRequest): Observable<any> {
+    return this.http.put<any>(this.urlbase + 'colunas/atualizar/' + id, titulo);
+  }
+
+  moverCartaoCaluna(request: MoverCartaoColunaRequest): Observable<any> {
+    return this.http.put<any>(this.urlbase + 'cartoes/atualizar', request);
+  }
+
+  recuperarNomeBoard() {
+    return this.http.get<Array<BoardNome>>(
+      this.urlbase + 'board/recuperarNome'
+    );
+  }
   isMobileDevice() {
     return (
       /iPad|iPhone|iPod/.test(navigator.userAgent) ||
       /(android)/i.test(navigator.userAgent)
+    );
+  }
+
+  listarCartoes(idboard: number): Observable<any> {
+    return this.http.get<any>(this.urlbase + 'cartoes/Listar/todos/' + idboard);
+  }
+
+  editarBoard(idboard: any, request: EditBoardRequest): Observable<any> {
+    return this.http.put<any>(
+      this.urlbase + 'board/editar/' + idboard,
+      request
+    );
+  }
+
+  exibirBoards(): Observable<Array<Board>> {
+    return this.http.get<Array<Board>>(this.urlbase + 'board/listar');
+  }
+
+  deleterColuna(idColuna: number): Observable<any> {
+    return this.http.delete<any>(this.urlbase + 'colunas/Deletar/' + idColuna);
+  }
+
+  deletetarBoard(idBoard: any): Observable<any> {
+    return this.http.delete<any>(this.urlbase + 'board/deletar/' + idBoard);
+  }
+
+  adicionarCartao(idColuna: any): Observable<any> {
+    return this.http.post<any>(
+      this.urlbase + 'cartoes/adicionar/' + idColuna,
+      null
+    );
+  }
+
+  editarCartao(
+    idCartao: number | null,
+    request: CartaoEditarRequest
+  ): Observable<any> {
+    return this.http.put<any>(
+      this.urlbase + 'cartoes/editar/' + idCartao,
+      request
     );
   }
 }

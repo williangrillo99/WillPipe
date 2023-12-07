@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { KanbanCard } from '../../models/types/kanban-card';
+import { Component, Input, OnInit } from '@angular/core';
+import { Cartao, ICartao, KanbanCard } from '../../models/types/kanban-card';
 import { Subscription } from 'rxjs';
 import { KanbanService } from '../../services/kanban.service';
 import { MenuItem } from 'primeng/api';
@@ -8,48 +8,15 @@ import { MenuItem } from 'primeng/api';
   selector: 'app-kanban-card',
   templateUrl: './kanban-card.component.html',
 })
-export class KanbanCardComponent {
+export class KanbanCardComponent implements OnInit {
   @Input() card!: KanbanCard;
+  @Input() cartao!: ICartao;
 
-  @Input() listId!: string;
-
-  menuItems: MenuItem[] = [];
-
-  subscription: Subscription;
-
-  constructor(private kanbanService: KanbanService) {
-    this.subscription = this.kanbanService.lists$.subscribe((data) => {
-      let subMenu = data.map((d) => ({
-        id: d.listId,
-        label: d.title,
-        command: () => this.onMove(d.listId),
-      }));
-      this.generateMenu(subMenu);
-    });
-  }
+  constructor(private kanbanService: KanbanService) {}
+  ngOnInit(): void {}
 
   parseDate(dueDate: string) {
     return new Date(dueDate).toDateString().split(' ').slice(1, 3).join(' ');
-  }
-
-  onDelete() {
-    this.kanbanService.deleteCard(this.card.id, this.listId);
-  }
-
-  onCopy() {
-    this.kanbanService.copyCard(this.card, this.listId);
-  }
-
-  onMove(listId: string) {
-    this.kanbanService.moveCard(this.card, listId, this.listId);
-  }
-
-  generateMenu(subMenu: any[]) {
-    this.menuItems = [
-      { label: 'Copiar cartão', command: () => this.onCopy() },
-      { label: 'Mover cartão', items: subMenu },
-      { label: 'Deletar cartão', command: () => this.onDelete() },
-    ];
   }
 
   generateTaskInfo() {
@@ -58,7 +25,5 @@ export class KanbanCardComponent {
     return `${completed} / ${total}`;
   }
 
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
-  }
+  ngOnDestroy() {}
 }

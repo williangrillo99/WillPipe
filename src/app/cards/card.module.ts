@@ -1,3 +1,4 @@
+import { CardComponent } from './pags/card.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AvatarModule } from 'primeng/avatar';
@@ -16,9 +17,12 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CardModule } from 'primeng/card';
 import { CardRoutingModule } from './card-routing.module';
+import { TableModule } from 'primeng/table';
+import { DropdownModule } from 'primeng/dropdown';
+import { KanbanService } from '../pipeline/services/kanban.service';
 
 @NgModule({
-  declarations: [],
+  declarations: [CardComponent],
   imports: [
     CommonModule,
     AvatarModule,
@@ -34,9 +38,12 @@ import { CardRoutingModule } from './card-routing.module';
     SidebarModule,
     CalendarModule,
     CheckboxModule,
+    DropdownModule,
     CardModule,
     InputTextareaModule,
     CardRoutingModule,
+    TableModule,
   ],
+  providers: [KanbanService],
 })
 export class CardModuleModule {}

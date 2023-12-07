@@ -12,7 +12,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { KanbanModalComponent } from './components/modal/kanban-modal.component';
 import { MenuModule } from 'primeng/menu';
 import { InplaceModule } from 'primeng/inplace';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { KanbanService } from './services/kanban.service';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { AutoCompleteModule } from 'primeng/autocomplete';
@@ -21,6 +21,14 @@ import { CalendarModule } from 'primeng/calendar';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CardModule } from 'primeng/card';
+import { DropdownModule } from 'primeng/dropdown';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ToastModule } from 'primeng/toast';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { CascadeSelectModule } from 'primeng/cascadeselect';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 @NgModule({
   declarations: [
@@ -30,7 +38,9 @@ import { CardModule } from 'primeng/card';
     KanbanListComponent,
   ],
   imports: [
+    ProgressSpinnerModule,
     CommonModule,
+    DropdownModule,
     KanbanRoutingModule,
     AvatarModule,
     AvatarGroupModule,
@@ -47,6 +57,17 @@ import { CardModule } from 'primeng/card';
     CheckboxModule,
     CardModule,
     InputTextareaModule,
+    ReactiveFormsModule,
+    FormsModule,
+    ToastModule,
+
+    SelectButtonModule,
+    CascadeSelectModule,
+
+    ButtonModule,
+
+    InputTextModule,
+    MultiSelectModule,
   ],
   exports: [KanbanListComponent],
   providers: [KanbanService],

@@ -1,4 +1,4 @@
-import { Usuario } from './assignee';
+import { IUsuario } from './assignee';
 
 export interface Comment {
   id?: string;
@@ -6,8 +6,8 @@ export interface Comment {
   image?: string;
   text: string;
 }
-export interface Comentario {
+export interface IComentario {
   Id: string;
   Texto: string;
-  Usuario: Usuario;
+  Usuario: IUsuario;
 }

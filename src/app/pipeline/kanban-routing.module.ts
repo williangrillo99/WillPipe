@@ -7,6 +7,10 @@ const routes: Routes = [
     path: '',
     component: KanbanComponent,
   },
+  {
+    path: ':id',
+    component: KanbanComponent,
+  },
 ];
 
 @NgModule({

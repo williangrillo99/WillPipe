@@ -5,11 +5,12 @@ import { AppLayoutModule } from './layout/app.layout.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from './auth/auth.service';
+import { LayoutService } from './layout/service/app.layout.service';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [AppRoutingModule, AppLayoutModule, BrowserModule, HttpClientModule],
-  providers: [AuthService],
+  providers: [AuthService, LayoutService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

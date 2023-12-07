@@ -2,7 +2,7 @@ export interface Task {
   text: string;
   completed: boolean;
 }
-export interface Tarefa {
+export interface ITarefa {
   Id: number;
   Completo: boolean;
 }

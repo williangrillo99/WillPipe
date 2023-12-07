@@ -1,39 +1,45 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
-import { KanbanCard } from '../../models/types/kanban-card';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { Cartao, KanbanCard } from '../../models/types/kanban-card';
 import { Member } from '../../models/types/member';
-import { Task } from '../../models/types/task';
-import { Comment } from '../../models/types/comment';
 import { ListName } from '../../models/types/list-name';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { MemberService } from '../../services/member.service';
 import { KanbanService } from '../../services/kanban.service';
 import { KanbanComponent } from '../../pages/kanban/kanban.component';
+import { ActivatedRoute, Route, Router } from '@angular/router';
 
 @Component({
   selector: 'app-kanban-sidebar',
   templateUrl: './kanban-modal.component.html',
   styleUrls: ['./kanban-modal.component.scss'],
 })
-export class KanbanModalComponent implements OnDestroy {
+export class KanbanModalComponent implements OnDestroy, OnInit {
   card: KanbanCard = {
     id: '',
     taskList: { title: 'Untitled Task List', tasks: [] },
   };
 
+  cartao!: Cartao;
   formValue!: KanbanCard;
 
+  cardForm: FormGroup;
   listId: string = '';
 
   filteredAssignees: Member[] = [];
 
   assignees: Member[] = [];
-
-  newComment: Comment = { id: '123', name: 'Jane Cooper', text: '' };
-
-  newTask: Task = { text: '', completed: false };
-
-  comment: string = '';
 
   taskContent: string = '';
 
@@ -47,120 +53,84 @@ export class KanbanModalComponent implements OnDestroy {
 
   cardSubscription: Subscription;
 
-  listSubscription: Subscription;
-
-  listNameSubscription: Subscription;
-
   @ViewChild('inputTitle') inputTitle!: ElementRef;
 
   @ViewChild('inputTaskListTitle') inputTaskListTitle!: ElementRef;
 
+  idBoard: number;
+
+  open!: boolean;
   constructor(
     public parent: KanbanComponent,
-    private memberService: MemberService,
-    private kanbanService: KanbanService
+    private memberService: MessageService,
+    private kanbanService: KanbanService,
+    private route: ActivatedRoute
   ) {
-    this.memberService
-      .getMembers()
-      .then((members) => (this.assignees = members));
+    this.idBoard = Number(this.route.snapshot.paramMap.get('id'));
+    this.cardForm = new FormGroup({
+      titulo: new FormControl('', Validators.required),
+      descricao: new FormControl(''),
+      dataInicio: new FormControl<Date | null>(null),
+      dataFinal: new FormControl<Date | null>(null),
+    });
 
-    this.cardSubscription = this.kanbanService.selectedCard$.subscribe(
-      (data) => {
-        this.card = data;
-        this.formValue = { ...data };
+    this.kanbanService.selectedCartao$.subscribe((x) => {
+      this.cartao = x;
+    });
+
+    this.cardSubscription = this.kanbanService.selectedCartao$.subscribe(
+      (x) => {
+        if (x.dataInicio != null) {
+          const dataInicio = new Date(x.dataInicio);
+          this.cardForm.controls['dataInicio'].setValue(dataInicio);
+        } else {
+          this.cardForm.controls['dataInicio'].setValue(null);
+        }
+        if (x.dataFim != null) {
+          const dataFim = new Date(x.dataFim);
+          this.cardForm.controls['dataFinal'].setValue(dataFim);
+        } else {
+          this.cardForm.controls['dataFinal'].setValue(null);
+        }
+        this.cardForm.controls['titulo'].setValue(x.titulo);
+        this.cardForm.controls['descricao'].setValue(x.descricao);
+        console.log(x);
       }
     );
-    this.listSubscription = this.kanbanService.selectedListId$.subscribe(
-      (data) => (this.listId = data)
-    );
-    this.listNameSubscription = this.kanbanService.listNames$.subscribe(
-      (data) => (this.listNames = data)
-    );
+
+    this.kanbanService.openModal$.subscribe((x) => {
+      this.open = x;
+    });
   }
+  ngOnInit(): void {}
 
   ngOnDestroy() {
     this.cardSubscription.unsubscribe();
-    this.listSubscription.unsubscribe();
-    this.listNameSubscription.unsubscribe();
+
     clearTimeout(this.timeout);
   }
 
   close() {
-    this.parent.sidebarVisible = false;
-    this.resetForm();
+    this.kanbanService.showModal();
   }
 
-  filterAssignees(event: any) {
-    let filtered: Member[] = [];
-    let query = event.query;
-
-    for (let i = 0; i < this.assignees.length; i++) {
-      let assignee = this.assignees[i];
-      if (
-        assignee.name &&
-        assignee.name.toLowerCase().indexOf(query.toLowerCase()) == 0
-      ) {
-        filtered.push(assignee);
-      }
-    }
-
-    this.filteredAssignees = filtered;
-  }
-
-  onComment(event: Event) {
-    event.preventDefault();
-    if (this.comment.trim().length > 0) {
-      this.newComment = { ...this.newComment, text: this.comment };
-      this.formValue?.comments?.unshift(this.newComment);
-      this.comment = '';
-    }
-  }
-
-  onSave(event: any) {
-    event.preventDefault();
-    this.card = { ...this.formValue };
-    this.kanbanService.updateCard(this.card, this.listId);
-    this.close();
-  }
-
-  onMove(listId: string) {
-    this.kanbanService.moveCard(this.formValue, listId, this.listId);
-  }
-
-  onDelete() {
-    this.kanbanService.deleteCard(this.formValue?.id || '', this.listId);
-    this.parent.sidebarVisible = false;
-    this.resetForm();
-  }
-
-  resetForm() {
-    this.formValue = {
-      id: '',
-      taskList: { title: 'Untitled Task List', tasks: [] },
-    };
-  }
-
-  addTaskList() {
-    this.showTaskContainer = !this.showTaskContainer;
-
-    if (!this.showTaskContainer) {
-      return;
-    } else if (!this.formValue.taskList) {
-      let id = this.kanbanService.generateId();
-      this.formValue = {
-        ...this.formValue,
-        taskList: { id: id, title: 'Untitled Task List', tasks: [] },
-      };
-    }
-  }
-
-  addTask(event: Event) {
-    event.preventDefault();
-    if (this.taskContent.trim().length > 0) {
-      this.newTask = { text: this.taskContent, completed: false };
-      this.formValue.taskList?.tasks.unshift(this.newTask);
-      this.taskContent = '';
-      this.calculateProgress();
+  onSave() {
+    if (this.cardForm.valid) {
+      this.kanbanService
+        .editarCartao(this.cartao.id, this.cardForm.value)
+        .subscribe((x) => {
+          this.kanbanService.getColunas(this.idBoard).subscribe((x) => {
+            this.kanbanService.colunas.next(x.coluna);
+            this.memberService.add({
+              severity: 'success',
+              summary: 'Sucesso!',
+              detail: 'Cartao editado',
+            });
+            setTimeout(() => {
+              this.close();
+            }, 100);
+          });
+        });
     }
   }
 
@@ -172,17 +142,6 @@ export class KanbanModalComponent implements OnDestroy {
       this.timeout = setTimeout(
         () => this.inputTaskListTitle.nativeElement.focus(),
         1
-      );
-    }
-  }
-
-  calculateProgress() {
-    if (this.formValue.taskList) {
-      let completed = this.formValue.taskList.tasks.filter(
-        (t) => t.completed
-      ).length;
-      this.formValue.progress = Math.round(
-        100 * (completed / this.formValue.taskList.tasks.length)
       );
     }
   }
