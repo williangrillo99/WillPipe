@@ -1,8 +1,8 @@
-import { Assignee, IUsuario } from './assignee';
 import { TaskList } from './task-list';
 import { Comment, IComentario } from './comment';
 import { ITarefa } from './task';
 import { Coluna, IColuna } from './colunas';
+import { Assignee, IUsuario } from './assignee';
 
 export interface KanbanCard {
   id: string;
@@ -32,6 +32,20 @@ export interface ICartao {
 }
 
 export class CartaoEditarRequest {
+  titulo: string;
+  descricao: string;
+  dataInicio: Date | null;
+  dataFim: Date | null;
+
+  constructor(parms: Partial<CartaoEditarRequest>) {
+    this.titulo = parms.titulo || '';
+    this.descricao = parms.descricao || '';
+    this.dataInicio = parms.dataInicio || null;
+    this.dataFim = parms.dataFim || null;
+  }
+}
+
+export class CartaoEdicaoRequest {
   titulo: string;
   descricao: string;
   dataInicio: Date | null;

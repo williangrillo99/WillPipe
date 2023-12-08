@@ -113,7 +113,7 @@ export class KanbanListComponent implements OnInit {
             this.service.add({
               severity: 'success',
               summary: 'Sucesso!',
-              detail: 'Cartao criado',
+              detail: 'Cartão criado',
             });
           });
         });
@@ -149,7 +149,7 @@ export class KanbanListComponent implements OnInit {
             this.service.add({
               severity: 'success',
               summary: 'Sucesso!',
-              detail: 'Cartao atualizado',
+              detail: 'Cartão atualizado',
             });
           });
         });
@@ -165,7 +165,7 @@ export class KanbanListComponent implements OnInit {
         this.service.add({
           severity: 'success',
           summary: 'Sucesso!',
-          detail: 'Titulo atualizado',
+          detail: 'Título atualizado',
         });
       });
     });

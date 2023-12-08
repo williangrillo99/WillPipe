@@ -21,14 +21,14 @@ export class AppMenuComponent implements OnInit {
           },
           {
             label: 'Pipelines',
-            icon: 'pi pi-fw pi-home',
+            icon: 'pi pi-fw pi-map',
             routerLink: ['/app/pipeline/'],
             expanded: true,
             routerLinkActiveOptions: 'active',
           },
           {
-            label: 'Cartoes',
-            icon: 'pi pi-fw pi-home',
+            label: 'Cartões',
+            icon: 'pi pi-fw pi-bookmark',
             routerLink: ['/app/cartoes'],
           },
         ],

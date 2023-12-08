@@ -11,9 +11,11 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { Cartao, KanbanCard } from '../../models/types/kanban-card';
-import { Member } from '../../models/types/member';
-import { ListName } from '../../models/types/list-name';
+import {
+  Cartao,
+  CartaoEdicaoRequest,
+  KanbanCard,
+} from '../../models/types/kanban-card';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { KanbanService } from '../../services/kanban.service';
@@ -37,10 +39,6 @@ export class KanbanModalComponent implements OnDestroy, OnInit {
   cardForm: FormGroup;
   listId: string = '';
 
-  filteredAssignees: Member[] = [];
-
-  assignees: Member[] = [];
-
   taskContent: string = '';
 
   timeout: any = null;
@@ -48,8 +46,6 @@ export class KanbanModalComponent implements OnDestroy, OnInit {
   showTaskContainer: boolean = false;
 
   menuItems: MenuItem[] = [];
-
-  listNames: ListName[] = [];
 
   cardSubscription: Subscription;
 
@@ -94,7 +90,6 @@ export class KanbanModalComponent implements OnDestroy, OnInit {
         }
         this.cardForm.controls['titulo'].setValue(x.titulo);
         this.cardForm.controls['descricao'].setValue(x.descricao);
-        console.log(x);
       }
     );
 
@@ -114,17 +109,40 @@ export class KanbanModalComponent implements OnDestroy, OnInit {
     this.kanbanService.showModal();
   }
 
+  deletar() {
+    console.log(this.cartao.id);
+    this.kanbanService.deletarCartao(this.cartao.id).subscribe((x) => {
+      this.kanbanService.getColunas(this.idBoard).subscribe((x) => {
+        this.kanbanService.colunas.next(x.coluna);
+        this.memberService.add({
+          severity: 'success',
+          summary: 'Sucesso!',
+          detail: 'Cartão deletado',
+        });
+        setTimeout(() => {
+          this.close();
+        }, 100);
+      });
+    });
+  }
   onSave() {
+    console.log(this.cardForm.value);
     if (this.cardForm.valid) {
+      const request: CartaoEdicaoRequest = new CartaoEdicaoRequest({
+        titulo: this.cardForm.controls['titulo'].value,
+        descricao: this.cardForm.controls['descricao'].value,
+        dataInicio: this.cardForm.controls['dataInicio'].value,
+        dataFim: this.cardForm.controls['dataFinal'].value,
+      });
       this.kanbanService
-        .editarCartao(this.cartao.id, this.cardForm.value)
+        .editarCartao(this.cartao.id, request)
         .subscribe((x) => {
           this.kanbanService.getColunas(this.idBoard).subscribe((x) => {
             this.kanbanService.colunas.next(x.coluna);
             this.memberService.add({
               severity: 'success',
               summary: 'Sucesso!',
-              detail: 'Cartao editado',
+              detail: 'Cartão editado',
             });
             setTimeout(() => {
               this.close();

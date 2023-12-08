@@ -77,7 +77,6 @@ export class ModalBoardEditarComponent {
       this.editBoardRequest.nome = this.formBoardEditar.controls['Nome'].value;
       this.editBoardRequest.descricao =
         this.formBoardEditar.controls['Descricao'].value;
-      console.log(this.editBoardRequest);
       this.kanbanService
         .editarBoard(this.board.id, this.editBoardRequest)
         .pipe(

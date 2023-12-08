@@ -23,7 +23,7 @@ export class AppComponent implements OnInit {
       colorScheme: 'dim', //color scheme of the template, valid values are "light", "dim" and "dark"
       theme: 'indigo', //default component theme for PrimeNG
       menuTheme: 'colorScheme', //theme of the menu, valid values are "colorScheme", "primaryColor" and "transparent"
-      scale: 14, //size of the body font size to scale the whole application
+      scale: 14,
     };
   }
 }

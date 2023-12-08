@@ -36,8 +36,8 @@
   </ng-template>
   <ng-template pTemplate="footer">
     <div class="flex w-full justify-content-end border-top-1 surface-border py-5 px-5 gap-3">
-      <button pButton pRipple type="button" label="Deletar" class=" p-button-outlined p-button-danger" ></button>
-      <button pButton pRipple type="button"(click)="close()" label="Cancelar" class="p-button-primary p-button-danger"></button>
+      <button pButton pRipple type="button" (click)="deletar()" label="Deletar" class=" p-button-outlined p-button-danger" ></button>
+      <button pButton pRipple type="button" (click)="close()" label="Cancelar" class="p-button-primary p-button-danger"></button>
       <button pButton pRipple type="submit"  (click)="onSave()"label="Salvar" class="p-button-primary h-3rem" ></button>
     </div>
   </ng-template>

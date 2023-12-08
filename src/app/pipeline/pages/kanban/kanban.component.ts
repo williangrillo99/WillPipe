@@ -53,7 +53,6 @@ export class KanbanComponent implements OnInit, OnDestroy {
         this.kanbanService.colunas$.subscribe((x) => {
           this.colunas = x;
           this.colunaNomes = this.colunas.map((l) => l.nomeColuna || '');
-          console.log(this.colunaNomes);
         });
       });
   }

@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import {
   Cartao,
+  CartaoEdicaoRequest,
   CartaoEditarRequest,
   ICartao,
   KanbanCard,
@@ -186,11 +187,15 @@ export class KanbanService {
 
   editarCartao(
     idCartao: number | null,
-    request: CartaoEditarRequest
+    request: CartaoEdicaoRequest
   ): Observable<any> {
     return this.http.put<any>(
       this.urlbase + 'cartoes/editar/' + idCartao,
       request
     );
+  }
+
+  deletarCartao(idCartao: number | null): Observable<any> {
+    return this.http.delete<any>(this.urlbase + 'cartoes/Deletar/' + idCartao);
   }
 }

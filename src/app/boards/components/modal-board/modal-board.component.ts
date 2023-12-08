@@ -40,7 +40,6 @@ export class ModalBoardComponent {
   });
 
   close() {
-    console.log('d');
     this.closeSideBar.emit(false);
   }
 
